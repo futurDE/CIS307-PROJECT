@@ -1,93 +1,75 @@
-import authentication
-
-# Collect user password
-user_password = authentication.collectPasswordForRole()
-
-if user_password == 321:
-    print("Access granted! Welcome, User.")
-
-    # List to track books the user has borrowed
+# Main function for the user module
+def main(books):
+    # List to keep track of books borrowed by the user
     borrowed_books = []
 
-    # Function to display available books from the library file
-    def display_available_books():
-        try:
-            with open("book_library.txt", "r") as file:
-                books = file.readlines()
-                books = [book.strip() for book in books]  # Remove trailing newlines
-                return books
-        except FileNotFoundError:
-            print("Library file not found!")
-            return []
-
-    # Function to borrow books
-    def borrow_books():
-        available_books = display_available_books()
-
-        if not available_books:
-            print("No books are available to borrow.")
-            return
-
-        print("Available books to borrow:")
-        for book in available_books:
-            print(f"- {book}")
-
-        book_name = input("Enter the name of the book to borrow (or type 'exit' to return to the menu): ").strip()
-        if book_name.lower() == "exit":
-            return
-        elif book_name in available_books:
-            borrowed_books.append(book_name)
-            available_books.remove(book_name)
-
-            # Update the library file
-            with open("book_library.txt", "w") as file:
-                for book in available_books:
-                    file.write(f"{book}\n")
-
-            print(f"You have successfully borrowed '{book_name}'.")
-        else:
-            print(f"'{book_name}' is not available to borrow.")
-
-    # Function to return books
-    def return_books():
-        if not borrowed_books:
-            print("You haven't borrowed any books yet.")
-            return
-
-        print("Books you have borrowed:")
-        for book in borrowed_books:
-            print(f"- {book}")
-
-        book_name = input("Enter the name of the book to return (or type 'exit' to return to the menu): ").strip()
-        if book_name.lower() == "exit":
-            return
-        elif book_name in borrowed_books:
-            borrowed_books.remove(book_name)
-
-            # Add the returned book back to the library file
-            with open("book_library.txt", "a") as file:
-                file.write(f"{book_name}\n")
-
-            print(f"You have successfully returned '{book_name}'.")
-        else:
-            print(f"You haven't borrowed '{book_name}'.")
-
-    # User menu loop
-    while True:
+    while True:  # Infinite loop to keep showing the user menu until the user decides to go back
+        # Display the user menu options
         print("\nUser Menu:")
-        print("1. Borrow Books")
-        print("2. Return Books")
-        print("3. Exit")
-        choice = input("Select an option (1/2/3): ").strip()
+        print("1. View Available Books")
+        print("2. Borrow Books")
+        print("3. Return Books")
+        print("4. View Borrowed Books")
+        print("5. Exit User")
 
-        if choice == "1":
-            borrow_books()
-        elif choice == "2":
-            return_books()
-        elif choice == "3":
-            print("Exiting user menu. Goodbye!")
-            break
-        else:
-            print("Invalid choice! Please select 1, 2, or 3.")
-else:
-    print("Access denied! Invalid password.")
+        # Prompt the user to select an option
+        choice = input("Select an option (1/2/3/4/5): ").strip()
+
+        if choice == "1":  # Option to view available books
+            if books:  # Check if there are books available in the library
+                print("\nAvailable Books:")
+                for i, book in enumerate(books, 1):  # Enumerate to show a numbered list of books
+                    print(f"{i}. {book}")
+            else:
+                print("No books available. Please check with the admin.")  # Notify user if no books exist
+
+        elif choice == "2":  # Option to borrow books
+            if books:  # Ensure there are books available to borrow
+                print("\nAvailable Books:")
+                for i, book in enumerate(books, 1):  # Display a numbered list of books
+                    print(f"{i}. {book}")
+                try:
+                    # Prompt the user to select the book to borrow by its number
+                    book_index = int(input("Enter the number of the book to borrow: ")) - 1
+                    if 0 <= book_index < len(books):  # Validate the input number
+                        borrowed_books.append(books[book_index])  # Add the selected book to borrowed books
+                        print(f"You have borrowed the book '{books[book_index]}'.")
+                    else:
+                        print("Invalid book number.")  # Handle invalid book number
+                except ValueError:
+                    print("Invalid input. Please enter a number.")  # Handle non-numeric input
+            else:
+                print("No books available to borrow.")  # Notify user if no books exist
+
+        elif choice == "3":  # Option to return books
+            if borrowed_books:  # Check if there are books to return
+                print("\nBorrowed Books:")
+                for i, book in enumerate(borrowed_books, 1):  # Display a numbered list of borrowed books
+                    print(f"{i}. {book}")
+                try:
+                    # Prompt the user to select the book to return by its number
+                    book_index = int(input("Enter the number of the book to return: ")) - 1
+                    if 0 <= book_index < len(borrowed_books):  # Validate the input number
+                        returned_book = borrowed_books.pop(book_index)  # Remove the selected book from borrowed list
+                        print(f"Book '{returned_book}' returned successfully!")
+                    else:
+                        print("Invalid book number.")  # Handle invalid book number
+                except ValueError:
+                    print("Invalid input. Please enter a number.")  # Handle non-numeric input
+            else:
+                print("No borrowed books to return.")  # Notify user if no books have been borrowed
+
+        elif choice == "4":  # Option to view borrowed books
+            if borrowed_books:  # Check if there are borrowed books
+                print("\nYour Borrowed Books:")
+                for i, book in enumerate(borrowed_books, 1):  # Display a numbered list of borrowed books
+                    print(f"{i}. {book}")
+            else:
+                print("You have not borrowed any books.")  # Notify user if no books have been borrowed
+
+        elif choice == "5":  # Option to return to authentication
+            print("Returning...")
+            break  # Exit the loop to return to authentication
+
+        else:  # Handle invalid menu option
+            print("Invalid choice! Please try again.")

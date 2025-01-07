@@ -1,40 +1,32 @@
-''''
-Welcome. (Click 'A' for admin and 'U' for user: )
-'''
+import admin  # Importing the admin module to handle admin operations
+import user   # Importing the user module to handle user operations
 
-user_role = None
-admin_password = None
-user_password = None
+# Shared list to store books, accessible by both admin and user
+books = []
 
-def getUserRole():
-    global user_role
-    user_role = input("Click 'A' for Admin and 'U' for User: ")
-    if user_role != "A" and user_role != "U":
-        print("Invalid input!")
-        getUserRole()
-    else:
-        return user_role
+# Main function to control the authentication flow
+def main():
+    while True:  # Infinite loop to keep the program running until explicitly exited
+        # Display menu for selecting Admin or User
+        print("\nClick 'A' for Admin and 'U' for User:")
+        role = input("Enter your choice (A/U): ").strip().upper()  # Get user input and standardize to uppercase
 
-getUserRole()
-
-def collectPasswordForRole():
-    global admin_password
-    global user_password
-    if user_role == "A":
-        while True:  # Keep looping until a valid password is entered
-            admin_input = input("Enter admin password (123): ")
-            if admin_input.isdigit() and int(admin_input) == 123:
-                admin_password = int(admin_input)
-                return admin_password
+        if role == "A":  # If user selects Admin
+            # Prompt for admin password
+            password = input("Enter admin password (123): ").strip()
+            if password == "123":  # Check if the password is correct
+                print("\nAccess Granted. Welcome, Admin!")
+                admin.main(books)  # Call the admin module's main function and pass the shared book list
             else:
-                print("Invalid password! Please enter a valid password")
-    else:
-        while True:  # Keep looping until a valid password is entered
-            user_input = input("Enter user password (321): ")
-            if user_input.isdigit() and int(user_input) == 321:
-                user_password = int(user_input)
-                return user_password
-            else:
-                print("Invalid password! Please enter a valid password.")
+                print("Incorrect password. Try again.")  # Display error for incorrect password
 
-collectPasswordForRole()
+        elif role == "U":  # If user selects User
+            print("\nAccess Granted. Welcome, User!")
+            user.main(books)  # Call the user module's main function and pass the shared book list
+
+        else:  # If an invalid input is entered
+            print("Invalid choice! Please enter 'A' for Admin or 'U' for User.")
+
+# Entry point of the script
+if __name__ == "__main__":
+    main()  # Start the authentication process
